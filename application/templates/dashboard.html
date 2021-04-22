@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+  <h4 style="text-align: left; margin-top: -52px;">Reported Cases and Deaths for each Country</h4>
+  <div id="grid"></div>
+</div>
+<script type="text/javascript">
+    function redValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.renderers.NumericRenderer.apply(this, arguments);
+      td.style.color = 'red';
+      td.style.textAlign = 'right';
+      if (col === 3) {
+        td.innerHTML = '+' + td.innerHTML;
+      }
+    }
+    Handsontable.renderers.registerRenderer('redValueRenderer', redValueRenderer);
+
+    function blueValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.renderers.NumericRenderer.apply(this, arguments);
+      td.style.color = 'blue';
+      td.style.textAlign = 'right';
+      if (col === 1) {
+        td.innerHTML = '+' + td.innerHTML;
+      }
+    }
+    Handsontable.renderers.registerRenderer('blueValueRenderer', blueValueRenderer);
+
+    function greenValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.renderers.NumericRenderer.apply(this, arguments);
+      td.style.color = 'green';
+      td.style.textAlign = 'right';
+    }
+    Handsontable.renderers.registerRenderer('greenValueRenderer', greenValueRenderer);
+
+    function orangeValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.renderers.NumericRenderer.apply(this, arguments);
+      td.style.color = 'orange';
+      td.style.textAlign = 'right';
+    }
+    Handsontable.renderers.registerRenderer('orangeValueRenderer', orangeValueRenderer);
+
+    var colHeaders = {{cases_colHeaders|tojson}}
+    var data = {{cases_data|tojson}}
+    var columns = []
+
+    for(var i = 0; i < colHeaders.length; i++){
+       columns.push({})
+    }
+
+    var container = document.getElementById('grid');
+    var hot = new Handsontable(container, {
+      data: data,
+      rowHeaders: true,
+      columns: columns,
+      colHeaders: colHeaders,
+      contextMenu: true,
+      readOnly: true,
+      columnSorting: {
+        sortEmptyCells: true,
+        initialConfig: {
+          column: 1,
+          sortOrder: 'asc'
+        }
+      },
+      cells: function (row, col) {
+        var cellProperties = {};
+        var data = this.instance.getData();
+
+        if (col === 3 || col === 4) {
+          cellProperties.renderer = "redValueRenderer";
+        }
+
+        if (col === 1 || col === 2) {
+          cellProperties.renderer = "blueValueRenderer";
+        }
+
+        if (col === 5) {
+          cellProperties.renderer = "greenValueRenderer";
+        }
+
+        if (col === 6) {
+          cellProperties.renderer = "orangeValueRenderer";
+        }
+
+        return cellProperties;
+      }
+    });
+ </script>
+
+{% endblock %}
